@@ -1,0 +1,402 @@
+---
+title: "Google Search Trend Data"
+output: 
+  flexdashboard::flex_dashboard:
+    theme:
+      bg: "#F0F8FF"
+      fg: "#294153"
+      primary: "#8CA09B"
+      navbar-bg: "#F0F8FF"
+      base_font: 
+        google: Prompt
+      heading_font:
+        google: Prompt
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+setwd("C:/Users/marcu/Downloads/sta404/US data")
+library(flexdashboard)
+library(tidyverse)
+library(lubridate)
+library(usmap)
+library(plotly)
+```
+
+
+```{r, include=FALSE}
+US17<-read.csv("2017_US_weekly_symptoms_dataset.csv")%>%mutate(date=ymd(date))
+US18<-read.csv("2018_US_weekly_symptoms_dataset.csv")%>%mutate(date=ymd(date))
+US19<-read.csv("2019_US_weekly_symptoms_dataset.csv")%>%mutate(date=ymd(date))
+US20<-read.csv("2020_US_weekly_symptoms_dataset.csv")%>%mutate(date=as.Date(date,"%m/%d/%Y"))
+US21<-read.csv("2021_US_weekly_symptoms_dataset.csv")%>%mutate(date=ymd(date))
+US22<-read.csv("2022_US_weekly_symptoms_dataset.csv")%>%mutate(date=ymd(date))
+US1718<- rbind(US17, US18)
+US1920<-rbind(US19,US20)
+US2122<-rbind(US21, US22)
+USsemi<- rbind(US1718,US1920)
+USdata<- rbind(USsemi,US2122)
+USdf<-USdata[,c(1,3,8,11,16,29,94,112,173,176,367)]
+USdf2.0<-USdf%>%mutate(year=year(date),
+                       week=week(date))%>%
+  pivot_longer(cols=starts_with("symptom"),
+               names_to="Condition", values_to="RelDensity")%>%
+  mutate(Condition=str_remove(Condition, "symptom."))
+```
+
+
+Graphics
+===============================
+
+Column {data-width=465 .tabset}
+-----------------------------------------------------------------------
+
+
+### Acne
+```{r}
+##ACNE
+#filter rows no states
+mdf<-USdf2.0[USdf2.0$sub_region_1!="",]
+
+#filter yr 2018,acne and finding avg search vol
+mapdf<-mdf%>%filter(Condition=="Acne")%>%
+             group_by(sub_region_1)%>%
+             summarise(avgYrly=mean(RelDensity, na.rm=TRUE))
+#selecting two rows
+mapdf2<-mapdf%>%select(sub_region_1,avgYrly)
+colnames(mapdf2)<-c("state", "volume")
+
+
+plot_usmap(data=mapdf2, values="volume")+
+    scale_fill_continuous(low="lightcyan1", high="#293E43")+
+  labs(title="Mean Relative Search Volume for Acne by State",
+       subtitle="Years 2017-2022", fill="Mean Relative Search Volume")+
+  theme(plot.title = element_text(hjust=0.5), plot.subtitle = element_text(hjust=0.5),
+        legend.position = "bottom",
+        plot.background = element_rect(fill="#F0F8FF", color="#F0F8FF"),
+        legend.background = element_rect(fill="#F0F8FF"),
+        panel.background = element_rect(fill="#F0F8FF", color="#F0F8FF"))
+
+```
+
+> This U.S. map displays the relative mean volume of the search term "Acne" from the years 2017 to 2022.
+
+### Anxiety
+```{r}
+##ANXIETY
+
+mapdfanx<-mdf%>%filter(Condition=="Anxiety")%>%
+             group_by(sub_region_1)%>%
+             summarise(avgYrly=mean(RelDensity, na.rm=TRUE))
+#selecting two rows
+mapdfanx2<-mapdfanx%>%select(sub_region_1,avgYrly)
+
+colnames(mapdfanx2)<-c("state", "volume")
+
+
+plot_usmap(data=mapdfanx2, values="volume")+
+    scale_fill_continuous(low="lightcyan1", high="#293E43")+
+  labs(title="Mean Relative Search Volume for Anxiety by State",
+       subtitle="Years 2017-2022", fill="Mean Relative Search Volume")+
+  theme(plot.title = element_text(hjust=0.5), plot.subtitle = element_text(hjust=0.5),
+        legend.position = "bottom",
+        plot.background = element_rect(fill="#F0F8FF", color="#F0F8FF"),
+        legend.background = element_rect(fill="#F0F8FF"),
+        panel.background = element_rect(fill="#F0F8FF", color="#F0F8FF"))
+```
+
+> This U.S. map displays the relative mean volume of the search term "Anxiety" from the years 2017 to 2022.
+
+### Alcoholism
+```{r}
+##ALCOHOLISM
+
+mapdfalc<-mdf%>%filter(Condition=="Alcoholism")%>%
+             group_by(sub_region_1)%>%
+             summarise(avgYrly=mean(RelDensity, na.rm=TRUE))
+#selecting two rows
+mapdfalc2<-mapdfalc%>%select(sub_region_1,avgYrly)
+
+colnames(mapdfalc2)<-c("state", "volume")
+
+
+
+plot_usmap(data=mapdfalc2, values="volume")+
+    scale_fill_continuous(low="lightcyan1", high="#293E43")+
+  labs(title="Mean Relative Search Volume for Alcoholism by State",
+       subtitle="Years 2017-2022", fill="Mean Relative Search Volume")+
+  theme(plot.title = element_text(hjust=0.5), plot.subtitle = element_text(hjust=0.5),
+        legend.position = "bottom",
+        plot.background = element_rect(fill="#F0F8FF", color="#F0F8FF"),
+        legend.background = element_rect(fill="#F0F8FF"),
+        panel.background = element_rect(fill="#F0F8FF", color="#F0F8FF"))
+  
+```
+
+> This U.S. map displays the relative mean volume of the search term "Alcoholism" from the years 2017 to 2022.
+
+### Compulsive Behavior
+```{r}
+##COMPULSIVE BEHAVIOR
+
+mapdfcom<-mdf%>%filter(Condition=="Compulsive.behavior")%>%
+             group_by(sub_region_1)%>%
+             summarise(avgYrly=mean(RelDensity, na.rm=TRUE))
+#selecting two rows
+mapdfcom2<-mapdfcom%>%select(sub_region_1,avgYrly)
+
+colnames(mapdfcom2)<-c("state", "volume")
+
+
+
+plot_usmap(data=mapdfcom2, values="volume")+
+    scale_fill_continuous(low="lightcyan1", high="#293E43")+
+  labs(title="Mean Relative Search Volume for Compulsive Behavior by State",
+       subtitle="Years 2017-2022", fill="Mean Relative Search Volume")+
+  theme(plot.title = element_text(hjust=0.5), plot.subtitle = element_text(hjust=0.5),
+        legend.position = "bottom",
+        plot.background = element_rect(fill="#F0F8FF", color="#F0F8FF"),
+        legend.background = element_rect(fill="#F0F8FF"),
+        panel.background = element_rect(fill="#F0F8FF", color="#F0F8FF"))
+  
+```
+
+> This U.S. map displays the relative mean volume of the search term "Compulsive Behavior" from the years 2017 to 2022.
+
+
+
+### Depression
+```{r}
+##DEPRESSION
+
+mapdfdepr<-mdf%>%filter(Condition=="Depression")%>%
+             group_by(sub_region_1)%>%
+             summarise(avgYrly=mean(RelDensity, na.rm=TRUE))
+#selecting two rows
+mapdfdepr2<-mapdfdepr%>%select(sub_region_1,avgYrly)
+
+colnames(mapdfdepr2)<-c("state", "volume")
+
+
+plot_usmap(data=mapdfdepr2, values="volume")+
+    scale_fill_continuous(low="lightcyan1", high="#293E43")+
+  labs(title="Mean Relative Search Volume for Depression by State",
+       subtitle="Years 2017-2022", fill="Mean Relative Search Volume")+
+  theme(plot.title = element_text(hjust=0.5), plot.subtitle = element_text(hjust=0.5),
+        legend.position = "bottom",
+        plot.background = element_rect(fill="#F0F8FF", color="#F0F8FF"),
+        legend.background = element_rect(fill="#F0F8FF"),
+        panel.background = element_rect(fill="#F0F8FF", color="#F0F8FF"))
+  
+```
+
+> This U.S. map displays the relative mean volume of the search term "Depression" from the years 2017 to 2022.
+
+### Guilt
+```{r}
+##GUILT
+
+mapdfgui<-mdf%>%filter(Condition=="Guilt")%>%
+             group_by(sub_region_1)%>%
+             summarise(avgYrly=mean(RelDensity, na.rm=TRUE))
+#selecting two rows
+mapdfgui2<-mapdfgui%>%select(sub_region_1,avgYrly)
+
+colnames(mapdfgui2)<-c("state", "volume")
+
+
+plot_usmap(data=mapdfgui2, values="volume")+
+    scale_fill_continuous(low="lightcyan1", high="#293E43")+
+  labs(title="Mean Relative Search Volume for Guilt by State",
+       subtitle="Years 2017-2022", fill="Mean Relative Search Volume")+
+  theme(plot.title = element_text(hjust=0.5), plot.subtitle = element_text(hjust=0.5),
+        legend.position = "bottom",
+        plot.background = element_rect(fill="#F0F8FF", color="#F0F8FF"),
+        legend.background = element_rect(fill="#F0F8FF"),
+        panel.background = element_rect(fill="#F0F8FF", color="#F0F8FF"))
+  
+```
+
+> This U.S. map displays the relative mean volume of the search term "Guilt" from the years 2017 to 2022.
+
+### Hay Fever
+```{r}
+##HAY FEVER
+
+mapdfhay<-mdf%>%filter(Condition=="Hay.fever")%>%
+             group_by(sub_region_1)%>%
+             summarise(avgYrly=mean(RelDensity, na.rm=TRUE))
+#selecting two rows
+mapdfhay2<-mapdfhay%>%select(sub_region_1,avgYrly)
+
+colnames(mapdfhay2)<-c("state", "volume")
+
+
+plot_usmap(data=mapdfhay2, values="volume")+
+    scale_fill_continuous(low="lightcyan1", high="#293E43")+
+  labs(title="Mean Relative Search Volume for Hay Fever by State",
+       subtitle="Years 2017-2022", fill="Mean Relative Search Volume")+
+  theme(plot.title = element_text(hjust=0.5), plot.subtitle = element_text(hjust=0.5),
+        legend.position = "bottom",
+        plot.background = element_rect(fill="#F0F8FF", color="#F0F8FF"),
+        legend.background = element_rect(fill="#F0F8FF"),
+        panel.background = element_rect(fill="#F0F8FF", color="#F0F8FF"))
+  
+```
+
+> This U.S. map displays the relative mean volume of the search term "Hay Fever" from the years 2017 to 2022.
+
+
+
+
+### Sleep Deprivation
+```{r}
+##SLEEP DEPRIVATION
+
+mapdfsle<-mdf%>%filter(Condition=="Sleep.deprivation")%>%
+             group_by(sub_region_1)%>%
+             summarise(avgYrly=mean(RelDensity, na.rm=TRUE))
+#selecting two rows
+mapdfsle2<-mapdfsle%>%select(sub_region_1,avgYrly)
+
+colnames(mapdfsle2)<-c("state", "volume")
+
+
+plot_usmap(data=mapdfsle2, values="volume")+
+    scale_fill_continuous(low="lightcyan1", high="#293E43")+
+  labs(title="Mean Relative Search Volume for Sleep Deprivation by State",
+       subtitle="Years 2017-2022", fill="Mean Relative Search Volume")+
+  theme(plot.title = element_text(hjust=0.5), plot.subtitle = element_text(hjust=0.5),
+        legend.position = "bottom",
+        plot.background = element_rect(fill="#F0F8FF", color="#F0F8FF"),
+        legend.background = element_rect(fill="#F0F8FF"),
+        panel.background = element_rect(fill="#F0F8FF", color="#F0F8FF"))
+  
+```
+
+> This U.S. map displays the relative mean volume of the search term "Sleep Deprivation" from the years 2017 to 2022.
+
+
+Column {.tabset data-width=535}
+-----------------------------------------------------------------------
+
+### Line Plot
+
+```{r}
+#graph code
+line<-USdf2.0%>% group_by(Condition, year,week)%>%
+  mutate(meanDensity=mean(RelDensity,na.rm=TRUE))
+ln<-ggplot()+
+  geom_line(aes(x=date, y=meanDensity, group=Condition, color=Condition),data=line,size=0.7)+
+  theme_bw()+
+  scale_color_manual(labels=c("Acne","Alcoholism","Anxiety",
+                               "Compulsive Behavior","Depression", "Guilt", 
+                               "Hay Fever", "Sleep Deprivation"),
+                      values = c("lightcyan3", "steelblue4", "cadetblue",
+                                 "royalblue", "skyblue", "cornflowerblue",
+                                 "darkcyan", "darkslategray2"))+
+  theme(panel.border  = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line=element_line(color="black"),
+        plot.title = element_text(hjust=0.5),
+        plot.subtitle = element_text(hjust=0.5),
+        legend.title = element_text(size=10),
+        legend.key.size = unit(0.1,'cm'),
+        legend.text=element_text(size=7),
+        legend.key.height = unit(0.15,'cm'),
+        legend.key.width = unit(0.15,'cm'),
+        plot.background = element_rect(fill="#F0F8FF", color="#F0F8FF"),
+        legend.background = element_rect(fill="#F0F8FF"))+
+  labs(x="Year", y="Relative Search Volume", title="Mean Weekly Seach Volume for Varying Symptoms",
+       subtitle="Years 2017 to 2022")+
+  scale_x_date(date_labels="%Y",breaks="1 year", minor_breaks = "1 week")+
+  scale_y_discrete(limits=c(1,3,5,7,9,11))
+ggplotly(ln, tooltip=c("x", "y", "group"))
+```
+
+>The above graphic displays different search terms and their relative search volumes over the years 2017 to 2022.
+
+### Stacked Summary Plot
+
+```{r}
+bar<-USdf2.0%>%group_by(week,year) #filter(year!=2017)%>%
+br<-ggplot()+
+  stat_summary(aes(x=year,y=RelDensity,fill=Condition),data=bar,fun="mean",geom="bar",position = "fill")+
+  theme_bw()+
+  scale_fill_manual(labels=c("Acne","Alcoholism","Anxiety",
+                               "Compulsive Behavior","Depression", "Guilt", 
+                               "Hay Fever", "Sleep Deprivation"),
+                      values = c("lightcyan3", "steelblue4", "cadetblue",
+                                 "royalblue", "skyblue", "cornflowerblue",
+                                 "darkcyan", "darkslategray2"))+
+  theme(legend.title = element_text(size=10),
+        legend.key.size = unit(0.1,'cm'),
+        legend.text=element_text(size=7),
+        legend.key.height = unit(0.15,'cm'),
+        legend.key.width = unit(0.15,'cm'),
+        axis.ticks.length=unit(.05,'cm'),
+        axis.text.y=element_text(size=5),
+        panel.grid.major = element_blank(),
+        axis.title.y=element_text(size=8),
+        legend.position="right",
+        plot.title = element_text(hjust=0.6, size=12),
+        plot.subtitle = element_text(hjust=0.6,size=10),
+        plot.background = element_rect(fill="#F0F8FF", color="#F0F8FF"),
+        legend.background = element_rect(fill="#F0F8FF"))+
+  labs(title="Mean Relative Search Volumes by Year", subtitle="Years 2017 to 2022",
+       y="Mean Relative Search Volume")+
+  scale_x_discrete(limits=c(2017,2018,2019,2020,2021,2022),
+                   labels=c(2017,2018,2019,2020,2021,2022))
+ggplotly(br)
+```
+
+>The Graph above shows the mean relative search volume for each search term for years 2017 to 2022
+
+
+
+Description
+=======================
+
+**Project Summary**
+
+Our goal in this project is to visualize the trends in Google search terms involving mental health during a time period containing the pandemic, COVID-19. We want to see if COVID-19 (years 2020-2022) influenced the relative volume of specific Google searches. We also want to determine if different states in the U.S. have varying relative search volumes across our different search terms of interest. 
+
+
+We focus on the Google search trend data from the United States. The Google search terms included in our search-trend analysis are acne, alcoholism, anxiety, compulsive behavior, depression, guilt, hay fever, and sleep deprivation. These search terms are only a few of the included search keywords involving mental health in our original data set. 
+
+
+The Google Trend Search Data used in this project is collected from the years 2017 to 2022. The data contains the date of data collection, many Google search terms, and their relative search volume. The relative search volume in this data is calculated by taking the sum of a search term (per week) and dividing that sum by the total number of searches in that same week.
+
+For this project, we have kept the original relative search volume. In order to use this data set, we transformed our previously wide-formatted data into long-format. We additionally created columns for date (as original dates varied in format) and search symptom. 
+
+
+**Comments on the Graphs**
+
+In our plots of the U.S. map, we can see that the relative search volume for Google terms is correlated with the state searches are conducted in.
+
+Our line plot displays that terms acne and anxiety have greater relative search volumes than the remaining search terms. Some keywords have correlation with a higher search volume during the pandemic, but this is not a universal correlation for all variables of interest.
+
+The stacked summary chart shows us that the proportion of relative search volumes vary by year. We see that the search terms anxiety and depression have correlation with higher proportions of relative searches after the start of the pandemic.
+
+
+**References**
+
+[Data Site](https://pair-code.github.io/covid19_symptom_dataset/?date=2020-08-31&country=SG)
+
+[R](https://www.R-project.org/)
+
+[R flexdashboard package](https://CRAN.R-project.org/package=flexdashboard)
+
+[R lubridate package](https://www.jstatsoft.org/v40/i03/)
+
+[R plotly package](https://plotly-r.com)
+
+[R tidyverse package](https://doi.org/10.21105/joss.01686)
+
+
+
+
+
+
